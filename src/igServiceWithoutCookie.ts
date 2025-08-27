@@ -39,7 +39,7 @@ export async function getInstagramGraphqlData(inputUrl: string) {
       "X-FB-LSD": X_FB_LSD,
       "X-ASBD-ID": X_ASBD_ID,
       "Sec-Fetch-Site": "same-origin",
-    },
+    } as Record<string, string>,
   });
 
   if (!response.ok) {

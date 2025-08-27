@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: ig-api-service
+    env: docker
+    region: frankfurt
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    autoDeploy: true
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # secrets -> set values in Render dashboard (do not commit)
+      - key: USER_AGENT
+        sync: false
+      - key: X_IG_APP_ID
+        sync: false
+      - key: COOKIE
+        sync: false
+      # optional/variable params
+      - key: X_FB_LSD
+        value: AVqbxe3J_YA
+      - key: X_ASBD_ID
+        value: "129477"
+      - key: IG_DOC_ID
+        value: "10015901848480474"

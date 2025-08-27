@@ -1,7 +1,9 @@
 # **Instagram Media Scraper Without API (Working January 2025)**
- This is simple Node.js (v20.12+) script to get public **information** and **media** (*images*, *videos*, *carousel*) from a specific instagram post or reel URL without API. Working in 2025.
+
+This is simple Node.js (v20.12+) script to get public **information** and **media** (_images_, _videos_, _carousel_) from a specific instagram post or reel URL without API. Working in 2025.
 
 # Table of Content
+
 - [How to get your Cookie, User-Agent and X-Ig-App-Id headers](#how-to-get-your-cookie-user-agent-and-x-ig-app-id-headers)
 - [Method 1: Magic Parameters](#method-1-magic-parameters)
   - [Code example](#code-example)
@@ -11,29 +13,32 @@
   - [Output example](#stringified-json-output-example-1)
 
 ## **How to get your Cookie, User-Agent and X-Ig-App-Id headers**
+
 - Login to Instagram
 - Go to your **profile page** or any **instagram page**.
 - Right click and **inspect** or press F12 (Chrome).
-    1. Select **Network** tab.
-    2. Selec **All** filter.
-    3. Select `timeline/` or `yourusername/` or `instagram/` or any of the `graphql` files. You can use the filter field to search for it. If it's empty just refresh the page.
-    4. Select **Headers** bar.
-    5. Scroll down and look for **Request Headers** tab.
-    6. Look for `ds_user_id` and `sessionid` and copy its values from your **Cookies**.
-    7. Copy your **User-Agent** code.
-       > User-Agent is included in the code, but I recommend to get your own.
-    8. Copy your **X-Ig-App-Id** code.
 
-    ```diff
-    - Your cookie will expire if you log out or switch accounts, you will need to get it again.
-    ``` 
+  1. Select **Network** tab.
+  2. Selec **All** filter.
+  3. Select `timeline/` or `yourusername/` or `instagram/` or any of the `graphql` files. You can use the filter field to search for it. If it's empty just refresh the page.
+  4. Select **Headers** bar.
+  5. Scroll down and look for **Request Headers** tab.
+  6. Look for `ds_user_id` and `sessionid` and copy its values from your **Cookies**.
+  7. Copy your **User-Agent** code.
+     > User-Agent is included in the code, but I recommend to get your own.
+  8. Copy your **X-Ig-App-Id** code.
+
+  ```diff
+  - Your cookie will expire if you log out or switch accounts, you will need to get it again.
+  ```
 
 ![scraper](https://github.com/ahmedrangel/instagram-media-scraper/assets/50090595/4cc339ea-a314-4696-8fc2-eaa756d4018e)
 
 > Don't share your cookie code with anyone!
 
-+ rename `.env.example` to `.env`
-+ enter the credentials
+- rename `.env.example` to `.env`
+- enter the credentials
+
 ```bash
 # required! Use this one or get your User-Agent from your browser
 USER_AGENT=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36
@@ -47,15 +52,15 @@ X_IG_APP_ID=
 
 ```diff
 - As this method uses cookies, it may lead to your account being restricted if it is detected as a bot. Use at your own risk.
-``` 
+```
 
 Using "Magic Parameters" `?__a=1&__d=dis`.
 
 You can get **information**, **image versions**, **video versions**, **carousel media** with their respective image versions and/or video versions of each of them, and more.
 
 ## Code example
-```js
 
+```js
 // Load from ENV
 process.loadEnvFile();
 
@@ -70,7 +75,8 @@ if (!_userAgent || !_cookie || !_xIgAppId) {
 
 // Function to get instagram post ID from URL string
 const getId = (url) => {
-  const regex = /instagram.com\/(?:[A-Za-z0-9_.]+\/)?(p|reels|reel|stories)\/([A-Za-z0-9-_]+)/;
+  const regex =
+    /instagram.com\/(?:[A-Za-z0-9_.]+\/)?(p|reels|reel|stories)\/([A-Za-z0-9-_]+)/;
   const match = url.match(regex);
   return match && match[2] ? match[2] : null;
 };
@@ -81,32 +87,37 @@ const getInstagramData = async (url) => {
   if (!igId) return "Invalid URL";
 
   // Fetch data from instagram post
-  const response = await fetch(`https://www.instagram.com/p/${igId}?__a=1&__d=dis`, {
-    headers: {
-      "Cookie": _cookie,
-      "User-Agent": _userAgent,
-      "X-IG-App-ID": _xIgAppId,
-      "Sec-Fetch-Site": "same-origin"
+  const response = await fetch(
+    `https://www.instagram.com/p/${igId}?__a=1&__d=dis`,
+    {
+      headers: {
+        Cookie: _cookie,
+        "User-Agent": _userAgent,
+        "X-IG-App-ID": _xIgAppId,
+        "Sec-Fetch-Site": "same-origin",
+      },
     }
-  });
+  );
 
   const json = await response.json();
   const items = json?.items[0];
   // You can return the entire items or create your own JSON object from them
   // return items;
-  
+
   // Check if post is a carousel
   let carousel_media = [];
-  items?.product_type === "carousel_container" ? (() => {
-    for (const el of items?.carousel_media) {
-      carousel_media.push({
-        image_versions: el?.image_versions2?.candidates,
-        video_versions: el?.video_versions
-      })
-    }
-    return carousel_media;
-  })() : carousel_media = undefined;
-  
+  items?.product_type === "carousel_container"
+    ? (() => {
+        for (const el of items?.carousel_media) {
+          carousel_media.push({
+            image_versions: el?.image_versions2?.candidates,
+            video_versions: el?.video_versions,
+          });
+        }
+        return carousel_media;
+      })()
+    : (carousel_media = undefined);
+
   // Return custom json object
   return {
     code: items?.code,
@@ -127,18 +138,21 @@ const getInstagramData = async (url) => {
     width: items?.original_width,
     image_versions: items?.image_versions2?.candidates,
     video_versions: items?.video_versions,
-    carousel_media
+    carousel_media,
   };
 };
 
-(async() => {
+(async () => {
   // Get data from instagram post or reel URL string
-  const data = await getInstagramData("https://www.instagram.com/reel/CtjoC2BNsB2");
+  const data = await getInstagramData(
+    "https://www.instagram.com/reel/CtjoC2BNsB2"
+  );
   console.log(data);
 })();
 ```
 
 ## Stringified JSON output example
+
 ```json
 {
   "code": "CtjoC2BNsB2",
@@ -184,6 +198,7 @@ Using graphql private API.
 You can get **information**, **thumbnail src**, **video url**, **carousel media** **sidecar (carousel media)** and more.
 
 ## Code example
+
 ```js
 // Load from ENV
 process.loadEnvFile();
@@ -198,7 +213,8 @@ if (!_userAgent || !_xIgAppId) {
 
 // Function to get instagram post ID from URL string
 const getId = (url) => {
-  const regex = /instagram.com\/(?:[A-Za-z0-9_.]+\/)?(p|reels|reel|stories)\/([A-Za-z0-9-_]+)/;
+  const regex =
+    /instagram.com\/(?:[A-Za-z0-9_.]+\/)?(p|reels|reel|stories)\/([A-Za-z0-9-_]+)/;
   const match = url.match(regex);
   return match && match[2] ? match[2] : null;
 };
@@ -212,7 +228,7 @@ const getInstagramGraphqlData = async (url) => {
   const graphql = new URL(`https://www.instagram.com/api/graphql`);
   graphql.searchParams.set("variables", JSON.stringify({ shortcode: igId }));
   graphql.searchParams.set("doc_id", "10015901848480474");
-  graphql.searchParams.set("lsd", "AVqbxe3J_YA"); 
+  graphql.searchParams.set("lsd", "AVqbxe3J_YA");
 
   const response = await fetch(graphql, {
     method: "POST",
@@ -222,12 +238,12 @@ const getInstagramGraphqlData = async (url) => {
       "X-IG-App-ID": _xIgAppId,
       "X-FB-LSD": "AVqbxe3J_YA",
       "X-ASBD-ID": "129477",
-      "Sec-Fetch-Site": "same-origin"
-    }
+      "Sec-Fetch-Site": "same-origin",
+    },
   });
 
   const json = await response.json();
-  const items = json?.data?.xdt_shortcode_media; 
+  const items = json?.data?.xdt_shortcode_media;
   // You can return the entire items or create your own JSON object from them
   // return items;
 
@@ -252,17 +268,20 @@ const getInstagramGraphqlData = async (url) => {
     thumbnail_src: items?.thumbnail_src,
     clips_music_attribution_info: items?.clips_music_attribution_info,
     sidecar: items?.edge_sidecar_to_children?.edges,
-  }
+  };
 };
 
-(async() => {
+(async () => {
   // Get data from instagram post or reel URL string
-  const data = await getInstagramGraphqlData("https://www.instagram.com/reel/CtjoC2BNsB2");
+  const data = await getInstagramGraphqlData(
+    "https://www.instagram.com/reel/CtjoC2BNsB2"
+  );
   console.log(data);
 })();
 ```
 
 ## Stringified JSON output example
+
 ```json
 {
   "__typename": "GraphVideo",
@@ -322,4 +341,38 @@ const getInstagramGraphqlData = async (url) => {
     "audio_id": "508221254754075"
   }
 }
+```
+
+## Run API Locally
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Copy the example environment file and fill in the required values:
+
+```bash
+cp .env.example .env
+```
+
+3. Start the development server:
+
+```bash
+npm run dev
+```
+
+4. Test the API with a GET request:
+
+```bash
+curl "http://localhost:3000/api/instagram?url=https://www.instagram.com/reel/CtjoC2BNsB2"
+```
+
+## Run API with Cookie
+
+To use the API with a cookie, make sure you have the required environment variables set up in your `.env` file. Then, you can test the API with the following command:
+
+```bash
+curl "http://localhost:3000/api/instagram/by-cookie?url=https://www.instagram.com/p/DN3LvLD1JtY"
 ```

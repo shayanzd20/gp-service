@@ -1,6 +1,3 @@
-// Load from ENV
-process.loadEnvFile();
-
 const _userAgent = process.env.USER_AGENT;
 const _cookie = process.env.COOKIE;
 const _xIgAppId = process.env.X_IG_APP_ID;
@@ -75,6 +72,8 @@ const getInstagramData = async (url) => {
 
 (async() => {
   // Get data from instagram post or reel URL string
-  const data = await getInstagramData("https://www.instagram.com/reel/CtjoC2BNsB2");
+  // const data = await getInstagramData("https://www.instagram.com/reel/CtjoC2BNsB2");
+  const data = await getInstagramData("https://www.instagram.com/p/DN3LvLD1JtY");
+
   console.log(data);
 })();

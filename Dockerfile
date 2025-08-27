@@ -21,6 +21,8 @@ COPY src ./src
 # Build TypeScript
 RUN npm run build
 
+RUN ls -la dist && sed -n '1,80p' dist/server.js
+
 # ---- runtime stage ----
 FROM node:20-alpine AS runtime
 WORKDIR /app

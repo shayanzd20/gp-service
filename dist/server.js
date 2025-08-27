@@ -1,12 +1,17 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 // src/server.ts
-import express from "express";
-import morgan from "morgan";
-import "dotenv/config";
-import { getInstagramGraphqlData } from "./igServiceWithoutCookie";
-import { getInstagramDataByCookie } from "./igServiceWithCookie";
+const express_1 = __importDefault(require("express"));
+const morgan_1 = __importDefault(require("morgan"));
+require("dotenv/config");
+const igServiceWithoutCookie_1 = require("./igServiceWithoutCookie");
+const igServiceWithCookie_1 = require("./igServiceWithCookie");
 const PORT = Number(process.env.PORT ?? 3000);
-const app = express();
-app.use(morgan("dev"));
+const app = (0, express_1.default)();
+app.use((0, morgan_1.default)("dev"));
 app.get("/api/instagram", async (req, res) => {
     const url = String(req.query.url ?? "");
     if (!url)
@@ -14,7 +19,7 @@ app.get("/api/instagram", async (req, res) => {
             .status(400)
             .json({ ok: false, error: "Query param 'url' is required." });
     try {
-        const result = await getInstagramGraphqlData(url);
+        const result = await (0, igServiceWithoutCookie_1.getInstagramGraphqlData)(url);
         if (!result.ok)
             return res.status(result.status).json(result);
         return res.json(result);
@@ -40,7 +45,7 @@ app.get("/api/instagram/by-cookie", async (req, res) => {
             .json({ ok: false, error: "Query param 'url' is required." });
     try {
         const cookieOverride = req.header("x-ig-cookie") ?? undefined;
-        const result = await getInstagramDataByCookie(url, { cookieOverride });
+        const result = await (0, igServiceWithCookie_1.getInstagramDataByCookie)(url, { cookieOverride });
         if (!result.ok)
             return res.status(result.status).json(result);
         return res.json(result);
